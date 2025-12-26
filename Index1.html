@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Job Application Tracker</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    input, select, button {
+      padding: 8px;
+      margin: 5px;
+    }
+    button {
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      margin-top: 15px;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 8px;
+      text-align: center;
+    }
+    .delete {
+      background: red;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Job Application Tracker</h1>
+
+  <!-- Normal JavaScript -->
+  <button onclick="showMsg()">Normal JS Button</button>
+
+  <div id="root"></div>
+
+  <script>
+    function showMsg() {
+      alert("This alert is from plain JavaScript!");
+    }
+  </script>
+
+  <!-- React CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <!-- React Code -->
+  <script type="text/babel">
+    function App() {
+      const [company, setCompany] = React.useState("");
+      const [role, setRole] = React.useState("");
+      const [status, setStatus] = React.useState("Applied");
+      const [jobs, setJobs] = React.useState(
+        JSON.parse(localStorage.getItem("jobs")) || []
+      );
+
+      React.useEffect(() => {
+        localStorage.setItem("jobs", JSON.stringify(jobs));
+      }, [jobs]);
+
+      function addJob() {
+        if (!company || !role) return;
+
+        const newJob = {
+          company,
+          role,
+          status,
+          date: new Date().toLocaleString()
+        };
+
+        setJobs([...jobs, newJob]);
+        setCompany("");
+        setRole("");
+      }
+
+      function deleteJob(index) {
+        const updated = jobs.filter((_, i) => i !== index);
+        setJobs(updated);
+      }
+
+      return (
+        <div>
+          <h2>Add Job</h2>
+
+          <input
+            placeholder="Company Name"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+          />
+
+          <input
+            placeholder="Job Role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          />
+
+          <select value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option>Applied</option>
+            <option>Interview</option>
+            <option>Offer</option>
+            <option>Rejected</option>
+          </select>
+
+          <button onClick={addJob}>Add</button>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Date & Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {jobs.map((job, index) => (
+                <tr key={index}>
+                  <td>{job.company}</td>
+                  <td>{job.role}</td>
+                  <td>{job.status}</td>
+                  <td>{job.date}</td>
+                  <td>
+                    <button className="delete" onClick={() => deleteJob(index)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+
+</body>
+</html>
